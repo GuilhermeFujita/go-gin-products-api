@@ -78,3 +78,17 @@ func (pr *ProductRepository) GetProduct(productID int) (model.Product, error) {
 	return dbProduct, nil
 
 }
+
+func (pr *ProductRepository) UpdateProduct(product model.Product) error {
+	query, err := pr.connection.Prepare("UPDATE product SET product_name = $1, price = $2 WHERE id = $3")
+	if err != nil {
+		return err
+	}
+
+	_, err = query.Exec(product.Name, product.Price, product.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

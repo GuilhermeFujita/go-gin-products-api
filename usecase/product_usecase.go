@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"go-api/model"
 	"go-api/repository"
 )
@@ -32,4 +33,28 @@ func (pu *ProductUsecase) CreateProduct(product model.Product) (model.Product, e
 
 func (pu *ProductUsecase) GetProduct(productID int) (model.Product, error) {
 	return pu.repository.GetProduct(productID)
+}
+
+func (pu *ProductUsecase) UpdateProduct(productID int, data model.Product) error {
+	dbProduct, err := pu.repository.GetProduct(productID)
+	if err != nil {
+		return err
+	}
+
+	if dbProduct.ID == 0 {
+		return errors.New("Product not found")
+	}
+
+	productToUpdate := model.Product{
+		ID:    dbProduct.ID,
+		Name:  data.Name,
+		Price: data.Price,
+	}
+
+	err = pu.repository.UpdateProduct(productToUpdate)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

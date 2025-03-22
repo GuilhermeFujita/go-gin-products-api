@@ -81,3 +81,49 @@ func (p *productController) GetProduct(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, product)
 }
+
+func (p *productController) UpdateProduct(ctx *gin.Context) {
+	var product model.Product
+	err := ctx.BindJSON(&product)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	id := ctx.Param("productId")
+
+	if id == "" {
+		response := model.Response{
+			Message: "Product id is required",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	productID, err := strconv.Atoi(id)
+	if err != nil {
+		response := model.Response{
+			Message: "Product id is not a number",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	if err = p.productUseCase.UpdateProduct(productID, product); err != nil {
+		if err.Error() == "Product not found" {
+			var response model.Response
+			response = model.Response{
+				Message: "Product not found",
+			}
+			ctx.JSON(http.StatusNotFound, response)
+			return
+		}
+		response := model.Response{
+			Message: "Failed to update product",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
