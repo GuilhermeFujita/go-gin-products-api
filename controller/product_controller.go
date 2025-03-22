@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+	"go-api/dto"
 	"go-api/model"
 	"go-api/usecase"
 	"net/http"
@@ -30,14 +32,20 @@ func (p *productController) GetProducts(ctx *gin.Context) {
 }
 
 func (p *productController) CreateProduct(ctx *gin.Context) {
-	var product model.Product
-	err := ctx.BindJSON(&product)
+	var productDTO dto.ProductDTO
+	err := ctx.BindJSON(&productDTO)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	insertedProduct, err := p.productUseCase.CreateProduct(product)
+	err = productDTO.Validate()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Error validating product: %s", err))
+		return
+	}
+
+	insertedProduct, err := p.productUseCase.CreateProduct(productDTO)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return

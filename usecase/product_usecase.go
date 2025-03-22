@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"go-api/dto"
 	"go-api/model"
 	"go-api/repository"
 )
@@ -21,14 +22,17 @@ func (pu *ProductUsecase) GetProducts() ([]model.Product, error) {
 	return pu.repository.GetProducts()
 }
 
-func (pu *ProductUsecase) CreateProduct(product model.Product) (model.Product, error) {
+func (pu *ProductUsecase) CreateProduct(product dto.ProductDTO) (model.Product, error) {
 	productID, err := pu.repository.CreateProduct(product)
 	if err != nil {
 		return model.Product{}, err
 	}
 
-	product.ID = productID
-	return product, nil
+	return model.Product{
+		ID:    productID,
+		Name:  product.Name,
+		Price: product.Price,
+	}, nil
 }
 
 func (pu *ProductUsecase) GetProduct(productID int) (model.Product, error) {

@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"go-api/dto"
 	"go-api/model"
 )
 
@@ -39,7 +40,7 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 	return productList, nil
 }
 
-func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
+func (pr *ProductRepository) CreateProduct(product dto.ProductDTO) (int, error) {
 	query, err := pr.connection.Prepare("INSERT INTO product (product_name, price) VALUES ($1, $2) RETURNING id")
 	if err != nil {
 		fmt.Println(err)
