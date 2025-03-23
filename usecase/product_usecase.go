@@ -39,7 +39,7 @@ func (pu *ProductUsecase) GetProduct(productID int) (model.Product, error) {
 	return pu.repository.GetProduct(productID)
 }
 
-func (pu *ProductUsecase) UpdateProduct(productID int, data model.Product) error {
+func (pu *ProductUsecase) UpdateProduct(productID int, productDTO dto.ProductDTO) error {
 	dbProduct, err := pu.repository.GetProduct(productID)
 	if err != nil {
 		return err
@@ -51,8 +51,8 @@ func (pu *ProductUsecase) UpdateProduct(productID int, data model.Product) error
 
 	productToUpdate := model.Product{
 		ID:    dbProduct.ID,
-		Name:  data.Name,
-		Price: data.Price,
+		Name:  productDTO.Name,
+		Price: productDTO.Price,
 	}
 
 	err = pu.repository.UpdateProduct(productToUpdate)

@@ -84,12 +84,6 @@ func (p *productController) GetProduct(ctx *gin.Context) {
 }
 
 func (p *productController) UpdateProduct(ctx *gin.Context) {
-	var product model.Product
-	err := ctx.BindJSON(&product)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
-		return
-	}
 
 	id := ctx.Param("productId")
 	productID, valid := utils.ValidateID(id)
@@ -102,7 +96,19 @@ func (p *productController) UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	if err = p.productUseCase.UpdateProduct(productID, product); err != nil {
+	var productDTO dto.ProductDTO
+	err := ctx.BindJSON(&productDTO)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if err := productDTO.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, fmt.Sprintf("Error validating product: %s", err))
+		return
+	}
+
+	if err = p.productUseCase.UpdateProduct(productID, productDTO); err != nil {
 		if err.Error() == "Product not found" {
 			var response model.Response
 			response = model.Response{
