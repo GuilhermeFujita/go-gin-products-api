@@ -5,8 +5,8 @@ import (
 	"go-api/dto"
 	"go-api/model"
 	"go-api/usecase"
+	"go-api/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,18 +56,11 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 
 func (p *productController) GetProduct(ctx *gin.Context) {
 	id := ctx.Param("productId")
-	if id == "" {
-		response := model.Response{
-			Message: "Product id is required",
-		}
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
+	productID, valid := utils.ValidateID(id)
 
-	productID, err := strconv.Atoi(id)
-	if err != nil {
+	if !valid {
 		response := model.Response{
-			Message: "Product id is not a number",
+			Message: "Id is not a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
@@ -99,19 +92,11 @@ func (p *productController) UpdateProduct(ctx *gin.Context) {
 	}
 
 	id := ctx.Param("productId")
+	productID, valid := utils.ValidateID(id)
 
-	if id == "" {
+	if !valid {
 		response := model.Response{
-			Message: "Product id is required",
-		}
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	productID, err := strconv.Atoi(id)
-	if err != nil {
-		response := model.Response{
-			Message: "Product id is not a number",
+			Message: "Id is not a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
